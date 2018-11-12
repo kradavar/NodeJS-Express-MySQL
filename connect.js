@@ -21,10 +21,23 @@ connection.connect(function(err) {
   const sql = `INSERT INTO eventsList(name,start,end)
            VALUES('Test event','2018-10-10 12:00', '2018-10-10 13:00')`;
 
+  const insert = `INSERT INTO eventsList(name,start,end)
+           VALUES('?','?', '?')`;
+
+  const event = ["Test event 2", "2018-11-11 12:00", "2018-11-11 13:00"];
+
   connection.query(sql, function(err, results, fields) {
     if (err) {
       console.log(err.message);
     }
+  });
+
+  connection.query(insert, event, (err, results, fields) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    // get inserted id
+    console.log("Event Id:" + results.insertId);
   });
 
   connection.end(function(err) {
