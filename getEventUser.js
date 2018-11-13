@@ -1,23 +1,21 @@
 const mysql = require("mysql");
 const config = require("./config");
-const connection = mysql.createConnection(config);
-const getUserEvents = () => {
-  connection.connect(err => {
-    if (err) {
-      return console.warn("error: " + err.message);
-    }
-
-    // get user ID from console
-    const id = process.argv[2];
-    const query = `SELECT * FROM eventsList WHERE user_id = ?`;
-    connection.query(query, [id], (err, results, fields) => {
+const getUserEvents = (id, callback) => {
+  return new Promise((resolve, reject) => {
+    const connection = mysql.createConnection(config);
+    connection.connect(err => {
       if (err) {
-        return console.error(err.message);
+        return console.warn("error: " + err.message);
       }
-      console.log(results);
+      const query = `SELECT * FROM eventsList WHERE user_id = ?`;
+      connection.query(query, [id], (err, rows) => {
+        if (rows) {
+          resolve(rows);
+        }
+        reject(err);
+      });
+      connection.end(err => err && console.log(err.message));
     });
-
-    connection.end(err => err && console.log(err.message));
   });
 };
 
