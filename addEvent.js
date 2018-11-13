@@ -1,8 +1,8 @@
 const mysql = require("mysql");
 const config = require("./config");
-const connection = mysql.createConnection(config);
 
 const addEvent = (name, start, end, userID) => {
+  const connection = mysql.createConnection(config);
   connection.connect(err => {
     if (err) {
       return console.warn("error: " + err.message);
