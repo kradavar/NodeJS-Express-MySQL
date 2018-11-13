@@ -1,6 +1,6 @@
 const mysql = require("mysql");
 const config = require("./config");
-const getUserEvents = (id, callback) => {
+const getUserEvents = id => {
   return new Promise((resolve, reject) => {
     const connection = mysql.createConnection(config);
     connection.connect(err => {
