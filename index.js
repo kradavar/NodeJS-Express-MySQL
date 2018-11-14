@@ -28,7 +28,7 @@ const usersTable = `create table if not exists usersList(
 
 createTable(eventsTable, pool);
 createTable(usersTable, pool);
-
+/*
 executeSQL(["Test 3", "2018", "2018", 2], QUERY.INSERT_EVENT, pool);
 executeSQL(["Test 2", "2018", "2018", 1], QUERY.INSERT_EVENT, pool);
 executeSQL(["Test 1", "2018", "2018", 3], QUERY.INSERT_EVENT, pool);
@@ -36,7 +36,7 @@ executeSQL(["Test 1", "2018", "2018", 3], QUERY.INSERT_EVENT, pool);
 executeSQL(["root", "pass"], QUERY.INSERT_USER, pool);
 executeSQL(["darya", "qwerty"], QUERY.INSERT_USER, pool);
 executeSQL(["krasava", "1234"], QUERY.INSERT_USER, pool);
-
+*/
 app.get("/", (req, res) => {
   executeSQL([], QUERY.JOIN, pool).then(results => res.send(results));
 });
@@ -79,5 +79,5 @@ app.get("/events/:eventId", (req, res) => {
 });
 */
 app.listen(3000, function() {
-  console.log("Example app listening on port 3000!");
+  console.log("App listening on port 3000!");
 });
