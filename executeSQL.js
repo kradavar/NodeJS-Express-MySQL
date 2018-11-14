@@ -1,18 +1,18 @@
-const mysql = require("mysql");
-const config = require("./config");
-const getUserEvents = (eventInfoArray, query) => {
-  const connection = mysql.createConnection(config);
-  connection.connect(err => {
-    if (err) {
-      return console.warn("error: " + err.message);
-    }
-    connection.query(
-      query,
-      eventInfoArray,
-      (err, results, fields) => err && console.error(err.message)
-    );
-    connection.end(err => err && console.log(err.message));
+const executeSQL = (eventInfoArray, query, pool) =>
+  new Promise((resolve, reject) => {
+    eventInfoArray.length === 0
+      ? pool.query(query, (err, result) => {
+          if (result) {
+            resolve(result);
+          }
+          reject(err);
+        })
+      : pool.query(query, eventInfoArray, (err, result) => {
+          if (result) {
+            resolve(result);
+          }
+          reject(err);
+        });
   });
-};
 
-module.exports = getUserEvents;
+module.exports = executeSQL;
