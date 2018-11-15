@@ -6,11 +6,18 @@ const mysql = require("mysql");
 const QUERY = require("./queryList");
 const executeSQL = require("./executeSQL");
 const createTable = require("./createEventsTable");
+const cors = require("cors");
 
 const pool = mysql.createPool({
   connectionLimit: 100,
   ...config
 });
+
+app.use(
+  cors({
+    origin: "*" //http://localhost:3001
+  })
+);
 
 // create application/json parser
 const jsonParser = bodyParser.json();
@@ -64,13 +71,6 @@ app
       res.send(result)
     );
   });
-/*
-app.get("/events/:eventId", (req, res) => {
-  executeSQL([req.params.eventID], QUERY.SELECT_EVENT, pool).then(result =>
-    res.send(result)
-  );
-});
-*/
 app.listen(3000, function() {
   console.log("App listening on port 3000!");
 });
