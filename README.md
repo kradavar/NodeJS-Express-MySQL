@@ -6,4 +6,4 @@ Database dump: events.sql
 
 You can use default database. You need just type `mysql -uroot -pPASSWORD events < events.sql`
 
-You can use this server for the [Calendar](https://github.com/kradavar/react-redux-typescript-guide)
+You can use this server for the [Calendar](https://github.com/kradavar/Google-Calendar)
