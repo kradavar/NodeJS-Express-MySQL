@@ -54,7 +54,7 @@ app
   .post(jsonParser, (req, res) => {
     let formValues = Object.values(req.body);
     executeSQL(formValues, QUERY.INSERT_EVENT, pool).then(result =>
-      res.send({ ...req.body, id: result.insertId })
+      res.send(result)
     );
   });
 
