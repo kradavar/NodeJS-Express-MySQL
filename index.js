@@ -1,17 +1,23 @@
 const express = require("express");
 const app = express();
 const config = require("./config");
+const bodyParser = require("body-parser");
 const mysql = require("mysql");
 const QUERY = require("./queryList");
 const executeSQL = require("./executeSQL");
 const createTable = require("./createEventsTable");
-/* если нет таблицы, то создать
-возможно, при первом подключении */
 
 const pool = mysql.createPool({
   connectionLimit: 100,
   ...config
 });
+
+// create application/json parser
+const jsonParser = bodyParser.json();
+
+// create application/x-www-form-urlencoded parser
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
+
 const eventsTable = `create table if not exists eventsList(
                           id int primary key auto_increment,
                           event_name varchar(255)not null,
@@ -28,46 +34,33 @@ const usersTable = `create table if not exists usersList(
 
 createTable(eventsTable, pool);
 createTable(usersTable, pool);
-/*
-executeSQL(["Test 3", "2018", "2018", 2], QUERY.INSERT_EVENT, pool);
-executeSQL(["Test 2", "2018", "2018", 1], QUERY.INSERT_EVENT, pool);
-executeSQL(["Test 1", "2018", "2018", 3], QUERY.INSERT_EVENT, pool);
 
-executeSQL(["root", "pass"], QUERY.INSERT_USER, pool);
-executeSQL(["darya", "qwerty"], QUERY.INSERT_USER, pool);
-executeSQL(["krasava", "1234"], QUERY.INSERT_USER, pool);
-*/
 app.get("/", (req, res) => {
   executeSQL([], QUERY.JOIN, pool).then(results => res.send(results));
 });
-/*
-app.get("/users", (req, res) => {
-  executeSQL([], QUERY.SELECT_USERS, pool).then(users => res.send(users));
-});
-
-app.get("/users/:userID", (req, res) => {
-  executeSQL([req.params.userID], QUERY.SELECT_USER_EVENTS, pool).then(result =>
-    res.send(result)
-  );
-});*/
 
 app
   .route("/events")
   .get((req, res) => {
     executeSQL([], QUERY.SELECT_EVENTS, pool).then(events => res.send(events));
   })
-  .post((req, res, eventInfo) => {
-    executeSQL(eventInfo, QUERY.INSERT_EVENT, pool).then(result =>
+  .post(jsonParser, (req, res) => {
+    let formValues = Object.values(req.body);
+    executeSQL(formValues, QUERY.INSERT_EVENT, pool).then(result =>
       res.send(result)
     );
+  });
+
+app
+  .route("/events/:id")
+  .put(jsonParser, (req, res) => {
+    let formValues = Object.values(req.body);
+    let eventId = req.params.id;
+    let params = [...formValues, eventId];
+    executeSQL(params, QUERY.EDIT_EVENT, pool).then(result => res.send(result));
   })
-  .put((req, res, eventInfo) => {
-    executeSQL(eventInfo, QUERY.EDIT_EVENT, pool).then(result =>
-      res.send(result)
-    );
-  })
-  .delete((req, res, eventInfo) => {
-    executeSQL(eventInfo, QUERY.DELETE_EVENT, pool).then(result =>
+  .delete((req, res) => {
+    executeSQL(req.params.id, QUERY.DELETE_EVENT, pool).then(result =>
       res.send(result)
     );
   });
