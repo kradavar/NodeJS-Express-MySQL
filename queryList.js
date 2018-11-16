@@ -1,5 +1,5 @@
 const QUERY = {
-  INSERT_EVENT: `INSERT INTO eventsList(event_name,start,end,user_id) VALUES(?,?,?,?)`,
+  INSERT_EVENT: `INSERT INTO eventsList SET ?`,
   DELETE_EVENT: `DELETE FROM eventsList WHERE id = ?`,
   EDIT_EVENT: `UPDATE eventsList SET event_name = ?,start = ?,end=?, user_id = ? WHERE id = ?`,
   SELECT_USER_EVENTS: `SELECT * FROM eventsList WHERE user_id = ?`,

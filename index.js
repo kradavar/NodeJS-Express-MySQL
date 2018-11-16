@@ -52,8 +52,7 @@ app
     executeSQL([], QUERY.SELECT_EVENTS, pool).then(events => res.send(events));
   })
   .post(jsonParser, (req, res) => {
-    let formValues = Object.values(req.body);
-    executeSQL(formValues, QUERY.INSERT_EVENT, pool).then(result =>
+    executeSQL(req.body, QUERY.INSERT_EVENT, pool).then(result =>
       res.send(result)
     );
   });
@@ -71,6 +70,6 @@ app
       res.send(result)
     );
   });
-app.listen(3000, function() {
-  console.log("App listening on port 3000!");
+app.listen(5000, function() {
+  console.log("App listening on port 5000!");
 });
