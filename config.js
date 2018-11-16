@@ -2,7 +2,7 @@ const config = {
   host: "localhost",
   user: "root",
   password: "PASSWORD",
-  database: "events"
+  database: "calendar"
 };
 
 module.exports = config;
