@@ -26,7 +26,8 @@ CREATE TABLE `events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `event_name` varchar(255) NOT NULL,
   `start` varchar(255) NOT NULL,
-  `end` varchar(255) NOT NULL,
+  `
+end` varchar(255) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
@@ -38,7 +39,6 @@ CREATE TABLE `events` (
 
 LOCK TABLES `events` WRITE;
 /*!40000 ALTER TABLE `events` DISABLE KEYS */;
-INSERT INTO `events` VALUES (1,'Test 1','2018-10-11 13:00','2018-10-11 14:00',2),(2,'Test 2','2018-11-11 12:45','2018-11-11 13:00',1),(3,'Test 3','2018-11-15 18:00','2018-11-15 19:00',3),(4,'Test 4','2018-11-15 14:00','2018-11-15 15:20',2),(5,'Test 5','2018-11-16 09:45','2018-11-16 11:00',1),(6,'Test 6','2018-12-01 15:35','2018-12-01 15:50',3),(7,'Test 7','2018-11-24 07:45','2018-11-24 09:00',2),(8,'Test 8','2018-11-24 08:00','2018-11-24 08:30',1),(9,'Test 9','2018-11-24 09:00','2018-11-24 10:15',3),(10,'Test 10','2018-12-17 16:30','2018-12-17 17:15',1),(11,'Test 11','2018-12-06 12:00','2018-12-06 13:00',1),(12,'Test 12','2018-11-08 06:00','2018-11-06 08:15',3),(13,'Test 13','2018-12-12 14:00','2018-12-12 15:00',3),(14,'Test 14','2018-11-12 15:30','2018-11-12 15:45',1),(15,'Test 15','2018-10-12 19:30','2018-10-12 20:00',1),(16,'Test 16','2019-01-01 09:00','2019-01-01 11:00',2),(17,'Test 17','2018-12-24 13:30','2018-12-24 14:00',1),(18,'Test 18','2018-11-20 18:00','2018-11-20 19:00',1),(19,'Test 19','2018-11-20 18:00','2018-11-20 18:20',2),(20,'Test 20','2018-11-21 18:00','2018-11-21 19:00',1);
 /*!40000 ALTER TABLE `events` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -51,10 +51,12 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=latin1;
+  `username` varchar(100) NOT NULL,
+  `password` varchar(60) NOT NULL,
+  `full_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -63,7 +65,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'darya','qwerty'),(2,'krasava','1234'),(3,'root','pass');
+INSERT INTO `users` VALUES (1,'user','test','test user'),(2,'user1','test','test user1'),(3,'user2','test','test user2'),(4,'user3','test','test user3'),(5,'Test','testpass','New Test'),(10,'user4','testpass','New Test'),(11,'user5','testpass','New Test'),(12,'user8','testpass','New Test');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -76,4 +78,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-14 12:37:17
+-- Dump completed on 2018-11-19 15:44:03
