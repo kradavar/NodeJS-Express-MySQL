@@ -1,7 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-
+const cors = require("cors");
 const index = require("./routes/index.js");
 const users = require("./routes/users.js");
 const QUERY = require("./queryList.js");
@@ -13,6 +13,13 @@ const app = express();
 
 const flash = require("connect-flash");
 const crypto = require("crypto");
+
+app.use(
+  cors({
+    origin: "*" //http://localhost:3001
+  })
+);
+
 /* Login script */
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -50,7 +57,6 @@ passport.use(
       passReqToCallback: true //passback entire req to call back
     },
     (req, username, password, done) => {
-      console.log(username + " = " + password);
       if (!username || !password) {
         return done(
           null,
@@ -83,8 +89,8 @@ passport.use(
               req.flash("message", "Invalid username or password.")
             );
           }
-          req.session.user = rows[0];
-          return done(null, rows[0]);
+          //req.session.user = { ...rows[0] };
+          return done(null, { ...rows[0] });
         })
         .catch(err => done(req.flash("message", err)));
     }
@@ -92,11 +98,11 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user.username);
 });
 
-passport.deserializeUser((id, done) => {
-  executeSQL(QUERY.GET_USER_ID, [id])
+passport.deserializeUser((username, done) => {
+  executeSQL(QUERY.GET_USER, [username])
     .then(result => {
       done(null, result[0]);
     })
@@ -104,21 +110,18 @@ passport.deserializeUser((id, done) => {
       done(err);
     });
 });
-/*
-app.get('/signin', (req, res)=>{
-  res.render('login/index',{'message' :req.flash('message')});
+
+app.get("/signin", (req, res) => {
+  res.send("HEY");
 });
-*/
+
 app.post(
   "/signin",
   passport.authenticate("local", {
     successRedirect: "/events",
     failureRedirect: "/signin",
     failureFlash: true
-  }),
-  (req, res, info) => {
-    console.log(req.session);
-  }
+  })
 );
 
 app.get("/logout", (req, res) => {
@@ -144,6 +147,6 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500);
 });
 
-app.listen(5000, function() {
-  console.log("App listening on port 5000!");
+app.listen(5003, function() {
+  console.log("App listening on port 5003!");
 });

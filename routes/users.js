@@ -5,14 +5,16 @@ const jsonParser = bodyParser.json();
 /* GET user information after login */
 
 const isAuthenticated = (req, res, next) => {
-  if (req.session.user) return next();
+  console.log("isAuthenticated", req.session);
+  if (req.session.passport.user) return next();
 
   // IF A USER ISN'T LOGGED IN, THEN REDIRECT THEM SIGNIN PAGE
   res.redirect("/signin");
 };
-router.get("/events", isAuthenticated, (req, res, next) => {
-  executeSQL(QUERY.SELECT_USER_EVENTS, [req.session.user.id]).then(events =>
-    res.send(events)
+router.get("/events", (req, res, next) => {
+  console.log("hey");
+  executeSQL(QUERY.SELECT_USER_EVENTS, [req.session.passport.user]).then(
+    events => res.send(events)
   );
 });
 router.post("/events", isAuthenticated, jsonParser, (req, res) => {
