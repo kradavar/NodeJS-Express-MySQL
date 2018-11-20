@@ -62,7 +62,6 @@ passport.use(
 
       executeSQL(QUERY.GET_USER, [username])
         .then(rows => {
-          console.log(rows);
           if (!rows.length) {
             return done(
               null,
@@ -71,13 +70,13 @@ passport.use(
             );
           }
           salt = salt + "" + password;
-          const encPassword = crypto
+          const encPassword = crypto // later
             .createHash("sha1")
             .update(salt)
             .digest("hex");
           const dbPassword = rows[0].password;
 
-          if (!(dbPassword == encPassword)) {
+          if (!(dbPassword == password)) {
             return done(
               null,
               false,
@@ -97,9 +96,13 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  executeSQL(QUERY.GET_USER_ID, [id]).then((err, rows) => {
-    done(err, rows[0]);
-  });
+  executeSQL(QUERY.GET_USER_ID, [id])
+    .then(result => {
+      done(null, result[0]);
+    })
+    .catch(err => {
+      done(err);
+    });
 });
 /*
 app.get('/signin', (req, res)=>{
@@ -114,7 +117,6 @@ app.post(
     failureFlash: true
   }),
   (req, res, info) => {
-    res.redirect("/events");
     console.log(req.session);
   }
 );
