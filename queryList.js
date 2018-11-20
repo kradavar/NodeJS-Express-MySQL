@@ -9,7 +9,8 @@ const QUERY = {
   DELETE_USER: `DELETE FROM users WHERE id = ?`,
   EDIT_USER: `UPDATE users SET username = ?,password = ? full_name = ? WHERE id = ?`,
   SELECT_USERS: `SELECT * FROM users`,
-  GET_USER: `SELECT * FROM users WHERE username = ?`
+  GET_USER: `SELECT * FROM users WHERE username = ?`,
+  GET_USER_ID: `SELECT * FROM users WHERE id = ?`
 };
 
 module.exports = QUERY;
