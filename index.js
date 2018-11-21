@@ -4,8 +4,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const index = require("./routes/index.js");
 const events = require("./routes/events.js");
-const QUERY = require("./queryList.js");
-const executeSQL = require("./executeSQL.js");
+const QUERY = require("./database/queryList.js");
+const executeSQL = require("./database/executeSQL.js");
 
 const app = express();
 
@@ -57,7 +57,6 @@ passport.use(
       passReqToCallback: true //passback entire req to call back
     },
     (req, username, password, done) => {
-      console.log(req);
       if (!username || !password) {
         return done(
           null,
@@ -66,7 +65,6 @@ passport.use(
         );
       }
       let salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
-
       executeSQL(QUERY.GET_USER, [username])
         .then(rows => {
           if (!rows.length) {
@@ -99,17 +97,23 @@ passport.use(
 
 passport.use(
   "local-signup",
-  new LocalStrategy((req, done) => {
-    const user = Object.values(req.body);
-    executeSQL(QUERY.INSERT_USER, user)
-      .then(() => {
-        console.log("i am there");
-        executeSQL(QUERY.GET_USER, [req.body.username])
-          .then(rows => done(null, { ...rows[0] }))
-          .catch(err => done(err));
-      })
-      .catch(err => res.send(err));
-  })
+  new LocalStrategy(
+    {
+      usernameField: "username",
+      passwordField: "password",
+      passReqToCallback: true //passback entire req to call back
+    },
+    (req, username, password, done) => {
+      const user = Object.values(req.body);
+      debugger;
+      executeSQL(QUERY.INSERT_USER, user)
+        .then(result => {
+          console.log(result);
+          done(null, { ...req.body, id: result.insertId });
+        })
+        .catch(err => done(err));
+    }
+  )
 );
 
 passport.serializeUser((user, done) => {
@@ -146,7 +150,7 @@ app.post(
   })
 );
 
-app.get("/logout", (req, res) => {
+app.get("/signout", (req, res) => {
   req.session.destroy();
   req.logout();
   res.redirect("/signin");

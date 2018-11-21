@@ -6,6 +6,8 @@ const pool = mysql.createPool({
 });
 const executeSQL = (query, values) =>
   new Promise((resolve, reject) => {
+    console.log("QUERY", query);
+    console.log("Values", values);
     values.length === 0
       ? pool.query(query, (err, result) => {
           if (result) {
