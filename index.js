@@ -3,7 +3,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const index = require("./routes/index.js");
-const users = require("./routes/users.js");
+const events = require("./routes/events.js");
 const QUERY = require("./queryList.js");
 const executeSQL = require("./executeSQL.js");
 
@@ -45,11 +45,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/", index);
-app.use("/events", users);
+app.use("/events", events);
 
 //passport Strategy -- the express session middleware before calling passport.session()
 passport.use(
-  "local",
+  "local-signin",
   new LocalStrategy(
     {
       usernameField: "username",
@@ -57,6 +57,7 @@ passport.use(
       passReqToCallback: true //passback entire req to call back
     },
     (req, username, password, done) => {
+      console.log(req);
       if (!username || !password) {
         return done(
           null,
@@ -89,7 +90,6 @@ passport.use(
               req.flash("message", "Invalid username or password.")
             );
           }
-          //req.session.user = { ...rows[0] };
           return done(null, { ...rows[0] });
         })
         .catch(err => done(req.flash("message", err)));
@@ -97,12 +97,27 @@ passport.use(
   )
 );
 
+passport.use(
+  "local-signup",
+  new LocalStrategy((req, done) => {
+    const user = Object.values(req.body);
+    executeSQL(QUERY.INSERT_USER, user)
+      .then(() => {
+        console.log("i am there");
+        executeSQL(QUERY.GET_USER, [req.body.username])
+          .then(rows => done(null, { ...rows[0] }))
+          .catch(err => done(err));
+      })
+      .catch(err => res.send(err));
+  })
+);
+
 passport.serializeUser((user, done) => {
-  done(null, user.username);
+  done(null, user.id);
 });
 
-passport.deserializeUser((username, done) => {
-  executeSQL(QUERY.GET_USER, [username])
+passport.deserializeUser((userId, done) => {
+  executeSQL(QUERY.GET_USER_ID, [userId])
     .then(result => {
       done(null, result[0]);
     })
@@ -117,9 +132,16 @@ app.get("/signin", (req, res) => {
 
 app.post(
   "/signin",
-  passport.authenticate("local", {
+  passport.authenticate("local-signin", {
     successRedirect: "/events",
-    failureRedirect: "/signin",
+    failureFlash: true
+  })
+);
+
+app.post(
+  "/signup",
+  passport.authenticate("local-signup", {
+    successRedirect: "/events",
     failureFlash: true
   })
 );
