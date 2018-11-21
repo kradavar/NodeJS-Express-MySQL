@@ -30,8 +30,7 @@ CREATE TABLE `events`
 (255) NOT NULL,
   `start` varchar
 (255) NOT NULL,
-  `
-end` varchar
+  `end` varchar
 (255) NOT NULL,
   `user_id` int
 (11) NOT NULL,

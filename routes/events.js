@@ -12,14 +12,17 @@ const isAuthenticated = (req, res, next) => {
   res.redirect("/signin");
 };
 router.get("/", isAuthenticated, (req, res, next) => {
-  console.log("user id", req.session.passport.user);
   executeSQL(QUERY.SELECT_USER_EVENTS, [req.session.passport.user]).then(
-    events => res.send(events)
+    events => {
+      res.send(events);
+    }
   );
 });
 router.post("/", isAuthenticated, jsonParser, (req, res) => {
-  const params = { ...req.body, user_id: [req.session.passport.user] };
-  executeSQL(QUERY.INSERT_EVENT, params).then(result => res.send(result));
+  const params = [...Object.values(req.body), req.session.passport.user];
+  executeSQL(QUERY.INSERT_EVENT, params).then(result => {
+    res.send(result);
+  });
 });
 
 router.put("/:id", isAuthenticated, jsonParser, (req, res) => {
