@@ -16,7 +16,8 @@ const crypto = require("crypto");
 
 app.use(
   cors({
-    origin: "*" //http://localhost:3001
+    origin: "http://localhost:3000",
+    credentials: true
   })
 );
 
@@ -65,6 +66,7 @@ passport.use(
         );
       }
       let salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
+
       executeSQL(QUERY.GET_USER, [username])
         .then(rows => {
           if (!rows.length) {
@@ -74,11 +76,11 @@ passport.use(
               req.flash("message", "Invalid username or password.")
             );
           }
-          salt = salt + "" + password;
+          /* salt = salt + "" + password;
           const encPassword = crypto // later
             .createHash("sha1")
             .update(salt)
-            .digest("hex");
+            .digest("hex");*/
           const dbPassword = rows[0].password;
 
           if (!(dbPassword == password)) {
@@ -105,10 +107,8 @@ passport.use(
     },
     (req, username, password, done) => {
       const user = Object.values(req.body);
-      debugger;
       executeSQL(QUERY.INSERT_USER, user)
         .then(result => {
-          console.log(result);
           done(null, { ...req.body, id: result.insertId });
         })
         .catch(err => done(err));

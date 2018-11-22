@@ -7,7 +7,7 @@ const executeSQL = require("../database/executeSQL.js");
 /* GET user information after login */
 
 const isAuthenticated = (req, res, next) => {
-  if (req.session.passport.user) return next();
+  if (req.session.passport && req.session.passport.user) return next();
   // IF A USER ISN'T LOGGED IN, THEN REDIRECT THEM SIGNIN PAGE?
   res.redirect("/signin");
 };
