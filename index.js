@@ -131,13 +131,14 @@ passport.deserializeUser((userId, done) => {
 });
 
 app.get("/signin", (req, res) => {
-  res.send("HEY");
+  res.status(401).end();
 });
 
 app.post(
   "/signin",
   passport.authenticate("local-signin", {
     successRedirect: "/events",
+    failureRedirect: "/signin",
     failureFlash: true
   })
 );
