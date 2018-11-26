@@ -15,8 +15,10 @@ const executeSQL = (query, values) =>
         })
       : pool.query(query, values, (err, result) => {
           if (result) {
+            console.log("resolve");
             resolve(result);
           }
+          console.log("reject");
           reject(err);
         });
   });

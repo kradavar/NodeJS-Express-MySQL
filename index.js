@@ -59,22 +59,17 @@ passport.use(
     },
     (req, username, password, done) => {
       if (!username || !password) {
-        return done(
-          null,
-          false,
-          req.flash("message", "All fields are required.")
-        );
+        return done(null, false, { message: "All fields are required." });
       }
       let salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
 
       executeSQL(QUERY.GET_USER, [username])
         .then(rows => {
           if (!rows.length) {
-            return done(
-              null,
-              false,
-              req.flash("message", "Invalid username or password.")
-            );
+            return done(null, false, {
+              field: "username",
+              message: "User with that username not found."
+            });
           }
           /* salt = salt + "" + password;
           const encPassword = crypto // later
@@ -84,15 +79,14 @@ passport.use(
           const dbPassword = rows[0].password;
 
           if (!(dbPassword == password)) {
-            return done(
-              null,
-              false,
-              req.flash("message", "Invalid username or password.")
-            );
+            return done(null, false, {
+              field: "password",
+              message: "Invalid password."
+            });
           }
           return done(null, { ...rows[0] });
         })
-        .catch(err => done(req.flash("message", err)));
+        .catch(err => done(err));
     }
   )
 );
@@ -106,9 +100,12 @@ passport.use(
       passReqToCallback: true //passback entire req to call back
     },
     (req, username, password, done) => {
+      debugger;
       const user = Object.values(req.body);
+
       executeSQL(QUERY.INSERT_USER, user)
         .then(result => {
+          console.log("result", result);
           done(null, { ...req.body, id: result.insertId });
         })
         .catch(err => done(err));
@@ -131,25 +128,53 @@ passport.deserializeUser((userId, done) => {
 });
 
 app.get("/signin", (req, res) => {
-  res.status(401).end();
+  // res.status(401).json(req.session.flash.message);
+  // res.status(401).end();
 });
 
-app.post(
-  "/signin",
-  passport.authenticate("local-signin", {
-    successRedirect: "/events",
-    failureRedirect: "/signin",
-    failureFlash: true
-  })
-);
+app.post("/signin", (req, res, next) => {
+  passport.authenticate("local-signin", (err, user, info) => {
+    if (err) {
+      return next(err); //500 error
+    }
+    // Auth failed
+    if (!user) {
+      return res.json(401, {
+        hasErrors: true,
+        field: info.field,
+        message: info.message
+      });
+    }
+    req.logIn(user, err => {
+      if (err) {
+        return next(err);
+      }
+      return res.redirect("/events");
+    });
+  })(req, res, next);
+});
 
-app.post(
-  "/signup",
-  passport.authenticate("local-signup", {
-    successRedirect: "/events",
-    failureFlash: true
-  })
-);
+app.post("/signup", (req, res, next) => {
+  debugger;
+  passport.authenticate("local-signup", (err, user, info) => {
+    if (err) {
+      return next(err); //500 error
+    }
+    if (!user) {
+      return res.json(401, {
+        hasErrors: true,
+        field: info.field,
+        message: info.message
+      });
+    }
+    req.logIn(user, err => {
+      if (err) {
+        return next(err);
+      }
+      return res.redirect("/events");
+    });
+  })(req, res, next);
+});
 
 app.get("/signout", (req, res) => {
   req.session.destroy();
