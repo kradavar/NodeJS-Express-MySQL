@@ -105,7 +105,6 @@ passport.use(
 
       executeSQL(QUERY.INSERT_USER, user)
         .then(result => {
-          console.log("result", result);
           done(null, { ...req.body, id: result.insertId });
         })
         .catch(err => done(err));
@@ -182,7 +181,7 @@ app.post("/signup", (req, res, next) => {
 app.get("/signout", (req, res) => {
   req.session.destroy();
   req.logout();
-  res.json({ signOut: true });
+  res.json({ signOutDone: true });
 });
 
 // catch 404 and forward to error handler
