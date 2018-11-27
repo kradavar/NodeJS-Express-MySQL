@@ -158,7 +158,10 @@ app.post("/signup", (req, res, next) => {
   debugger;
   passport.authenticate("local-signup", (err, user, info) => {
     if (err) {
-      return next(err); //500 error
+      return res.json(400, {
+        hasErrors: true,
+        message: err.message
+      }); //400 error
     }
     if (!user) {
       return res.json(401, {
