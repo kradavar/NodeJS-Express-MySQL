@@ -182,7 +182,7 @@ app.post("/signup", (req, res, next) => {
 app.get("/signout", (req, res) => {
   req.session.destroy();
   req.logout();
-  res.redirect("/signin");
+  res.json({ signOut: true });
 });
 
 // catch 404 and forward to error handler
