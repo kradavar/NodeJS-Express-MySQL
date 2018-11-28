@@ -36,7 +36,7 @@ CREATE TABLE `events`
 (11) NOT NULL,
   PRIMARY KEY
 (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,7 +44,8 @@ CREATE TABLE `events`
 --
 LOCK TABLES `events` WRITE;
 /*!40000 ALTER TABLE `events` DISABLE KEYS */;
-INSERT INTO  `events` VALUES
+INSERT INTO  `events`
+VALUES
   (1, 'Test 1', '2018-10-11 13:00', '2018-10-11 14:00', 2),
   (2, 'Test 2', '2018-11-11 12:45', '2018-11-11 13:00', 1),
   (3, 'Test 3', '2018-11-15 18:00', '2018-11-15 19:00', 3),
@@ -69,6 +70,39 @@ INSERT INTO  `events` VALUES
 UNLOCK TABLES;
 
 --
+-- Table structure for table `permissions`
+--
+
+DROP TABLE IF EXISTS `permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `permissions`
+(
+  `id` int
+(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int
+(11) NOT NULL,
+  `other_user_id` int
+(11) NOT NULL,
+  `type` varchar
+(100) NOT NULL,
+  PRIMARY KEY
+(`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `permissions`
+--
+LOCK TABLES `permissions` WRITE;
+/*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
+INSERT INTO  `permissions`
+VALUES
+  (1, 2, 1, 'readonly'),
+  (2, 2, 3, 'readonly');
+/*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+--
 -- Table structure for table `users`
 --
 
@@ -89,7 +123,7 @@ CREATE TABLE `users`
 (`id`),
   UNIQUE KEY `unique_username`
 (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -98,15 +132,11 @@ CREATE TABLE `users`
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES
-  (1, 'user', 'test', 'test user'),
-  (2, 'user1', 'test', 'test user1'),
-  (3, 'user2', 'test', 'test user2'),
-  (4, 'user3', 'test', 'test user3'),
-  (5, 'Test', 'testpass', 'New Test'),
-  (10, 'user4', 'testpass', 'New Test'),
-  (11, 'user5', 'testpass', 'New Test'),
-  (12, 'user8', 'testpass', 'New Test');
+INSERT INTO `users`
+VALUES
+  (1, 'user1', 'test', 'test user1'),
+  (2, 'user2', 'test', 'test user2'),
+  (3, 'user3', 'test', 'test user3');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

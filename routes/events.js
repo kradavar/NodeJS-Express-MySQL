@@ -4,19 +4,39 @@ const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 const QUERY = require("../database/queryList.js");
 const executeSQL = require("../database/executeSQL.js");
+const getPermissions = require("../getPermissions");
 /* GET user information after login */
 
 const isAuthenticated = (req, res, next) => {
   if (req.session.passport && req.session.passport.user) return next();
-  // IF A USER ISN'T LOGGED IN, THEN REDIRECT THEM SIGNIN PAGE?
-  res.redirect("/signin");
+  return res.json(401, { hasErrors: true, message: "User is unauthorized" });
 };
+
 router.get("/", isAuthenticated, (req, res, next) => {
-  executeSQL(QUERY.SELECT_USER_EVENTS, [req.session.passport.user]).then(
-    events => {
-      res.send(events);
+  getPermissions(req.session.passport.user).then(users => {
+    const userList = [...users, req.session.passport.user];
+    const promises = [];
+    for (let i = 0; i < userList.length; i++) {
+      promises.push(executeSQL(QUERY.SELECT_USER_EVENTS, userList[i]));
     }
-  );
+    Promise.all(promises)
+      .then(events => {
+        const reply = events.map(userEvents => {
+          return {
+            // hardcode!
+            userId: userEvents[0].user_id,
+            events: userEvents
+          };
+        });
+        res.send(reply);
+      })
+      .catch(err => {
+        res.json(401, {
+          hasErrors: true,
+          message: err.message
+        });
+      });
+  });
 });
 router.post("/", isAuthenticated, jsonParser, (req, res) => {
   const params = [...Object.values(req.body), req.session.passport.user];

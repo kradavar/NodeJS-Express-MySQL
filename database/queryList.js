@@ -10,7 +10,8 @@ const QUERY = {
   EDIT_USER: `UPDATE users SET username = ?,password = ? full_name = ? WHERE id = ?`,
   SELECT_USERS: `SELECT * FROM users`,
   GET_USER: `SELECT * FROM users WHERE username = ?`,
-  GET_USER_ID: `SELECT * FROM users WHERE id = ?`
+  GET_USER_ID: `SELECT * FROM users WHERE id = ?`,
+  GET_PERMISSIONS: `SELECT other_user_id,type FROM permissions WHERE user_id = ?`
 };
 
 module.exports = QUERY;

@@ -61,7 +61,6 @@ passport.use(
       if (!username || !password) {
         return done(null, false, { message: "All fields are required." });
       }
-      let salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
 
       executeSQL(QUERY.GET_USER, [username])
         .then(rows => {
@@ -71,11 +70,6 @@ passport.use(
               message: "User with that username not found."
             });
           }
-          /* salt = salt + "" + password;
-          const encPassword = crypto // later
-            .createHash("sha1")
-            .update(salt)
-            .digest("hex");*/
           const dbPassword = rows[0].password;
 
           if (!(dbPassword == password)) {
@@ -124,11 +118,6 @@ passport.deserializeUser((userId, done) => {
     .catch(err => {
       done(err);
     });
-});
-
-app.get("/signin", (req, res) => {
-  // res.status(401).json(req.session.flash.message);
-  // res.status(401).end();
 });
 
 app.post("/signin", (req, res, next) => {
