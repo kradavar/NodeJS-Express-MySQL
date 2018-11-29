@@ -21,6 +21,7 @@ router.get("/", isAuthenticated, (req, res, next) => {
     }
     Promise.all(promises)
       .then(events => {
+        // const reply = Array.prototype.concat.apply([], events);
         const reply = events.map(userEvents => {
           return {
             // hardcode!
