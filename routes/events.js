@@ -13,6 +13,7 @@ const isAuthenticated = (req, res, next) => {
 };
 
 router.get("/", isAuthenticated, (req, res, next) => {
+  debugger;
   getPermissions(req.session.passport.user).then(users => {
     const userList = [...users, req.session.passport.user];
     const promises = [];
@@ -21,15 +22,24 @@ router.get("/", isAuthenticated, (req, res, next) => {
     }
     Promise.all(promises)
       .then(events => {
-        // const reply = Array.prototype.concat.apply([], events);
-        const reply = events.map(userEvents => {
-          return {
-            // hardcode!
-            userId: userEvents[0].user_id,
-            events: userEvents
-          };
-        });
-        res.send(reply);
+        if (events.length === 1 && events[0].length === 0) {
+          // case for sign up
+          res.send([
+            {
+              userId: req.session.passport.user,
+              events: []
+            }
+          ]);
+        } else {
+          const reply = events.map(userEvents => {
+            return {
+              // hardcode?
+              userId: userEvents[0].user_id,
+              events: userEvents
+            };
+          });
+          res.send(reply);
+        }
       })
       .catch(err => {
         res.json(401, {

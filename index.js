@@ -78,6 +78,7 @@ passport.use(
               message: "Invalid password."
             });
           }
+          console.log({ ...rows[0] });
           return done(null, { ...rows[0] });
         })
         .catch(err => done(err));
@@ -94,12 +95,12 @@ passport.use(
       passReqToCallback: true //passback entire req to call back
     },
     (req, username, password, done) => {
-      debugger;
       const user = Object.values(req.body);
 
       executeSQL(QUERY.INSERT_USER, user)
         .then(result => {
-          done(null, { ...req.body, id: result.insertId });
+          console.log({ id: result.insertId, ...req.body });
+          return done(null, { id: result.insertId, ...req.body });
         })
         .catch(err => done(err));
     }
@@ -137,13 +138,12 @@ app.post("/signin", (req, res, next) => {
       if (err) {
         return next(err);
       }
-      return res.redirect("/events");
+      return res.send(user);
     });
   })(req, res, next);
 });
 
 app.post("/signup", (req, res, next) => {
-  debugger;
   passport.authenticate("local-signup", (err, user, info) => {
     if (err) {
       return res.json(400, {
@@ -162,9 +162,15 @@ app.post("/signup", (req, res, next) => {
       if (err) {
         return next(err);
       }
-      return res.redirect("/events");
+      return res.send({ ok: true, user });
     });
   })(req, res, next);
+});
+
+app.get("/me", (req, res) => {
+  if (req.session.passport && req.session.passport.user) {
+    res.redirect("/events");
+  } else res.json(401, { hasErrors: true, message: "User is unauthorized" });
 });
 
 app.get("/signout", (req, res) => {
