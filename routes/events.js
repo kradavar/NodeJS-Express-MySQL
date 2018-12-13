@@ -21,16 +21,22 @@ router.get("/", isAuthenticated, (req, res, next) => {
     }
     inList = inList.substring(0, inList.length - 1);
     inList += ")";
-    executeSQL(QUERY.SELECT_USER_EVENTS + inList, userList).then(events => {
-      const reply = userList.map(userId => {
-        const eventsByUser = events.filter(event => event.user_id === userId);
-        return {
-          userId,
-          events: eventsByUser
-        };
+    executeSQL(QUERY.SELECT_USER_EVENTS + inList, userList)
+      .then(events => {
+        const reply = userList.map(userId => {
+          const eventsByUser = events.filter(event => event.user_id === userId);
+          return {
+            userId,
+            events: eventsByUser
+          };
+        });
+        res.send(reply);
+      })
+      .catch(err => {
+        setTimeout(() => {
+          res.json({ hasErrors: true, error: err });
+        }, 1500);
       });
-      res.send(reply);
-    });
   });
 });
 router.post("/", isAuthenticated, jsonParser, (req, res) => {
