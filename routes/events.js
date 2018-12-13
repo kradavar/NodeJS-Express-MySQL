@@ -13,47 +13,44 @@ const isAuthenticated = (req, res, next) => {
 };
 
 router.get("/", isAuthenticated, (req, res, next) => {
-  debugger;
   getPermissions(req.session.passport.user).then(users => {
     const userList = [...users, req.session.passport.user];
-    const promises = [];
+    let inList = "";
     for (let i = 0; i < userList.length; i++) {
-      promises.push(executeSQL(QUERY.SELECT_USER_EVENTS, userList[i]));
+      inList += "?,";
     }
-    Promise.all(promises)
-      .then(events => {
-        if (events.length === 1 && events[0].length === 0) {
-          // case for sign up
-          res.send([
-            {
-              userId: req.session.passport.user,
-              events: []
-            }
-          ]);
-        } else {
-          const reply = events.map(userEvents => {
-            return {
-              // hardcode?
-              userId: userEvents[0].user_id,
-              events: userEvents
-            };
-          });
-          res.send(reply);
-        }
-      })
-      .catch(err => {
-        res.json(401, {
-          hasErrors: true,
-          message: err.message
-        });
+    inList = inList.substring(0, inList.length - 1);
+    inList += ")";
+    executeSQL(QUERY.SELECT_USER_EVENTS + inList, userList).then(events => {
+      const reply = userList.map(userId => {
+        const eventsByUser = events.filter(event => event.user_id === userId);
+        return {
+          userId,
+          events: eventsByUser
+        };
       });
+      res.send(reply);
+    });
   });
 });
 router.post("/", isAuthenticated, jsonParser, (req, res) => {
   const params = [...Object.values(req.body), req.session.passport.user];
-  executeSQL(QUERY.INSERT_EVENT, params).then(result => {
-    res.send(result);
-  });
+  executeSQL(QUERY.INSERT_EVENT, params)
+    .then(result => {
+      executeSQL(QUERY.SELECT_EVENT, [result.insertId]).then(result => {
+        setTimeout(() => {
+          res.send({ ...result[0] });
+        }, 1500);
+      });
+    })
+    .catch(err => {
+      setTimeout(() => {
+        res.json({
+          hasErrors: true,
+          error: err
+        });
+      }, 1500);
+    });
 });
 
 router.put("/:id", isAuthenticated, jsonParser, (req, res) => {
@@ -62,13 +59,29 @@ router.put("/:id", isAuthenticated, jsonParser, (req, res) => {
     req.session.passport.user,
     req.params.id
   ];
-  executeSQL(QUERY.EDIT_EVENT, params).then(result => res.send(result));
+  executeSQL(QUERY.EDIT_EVENT, params)
+    .then(result => {
+      executeSQL(QUERY.SELECT_EVENT, [req.params.id]).then(result => {
+        setTimeout(() => {
+          res.send({ ...result[0] });
+        }, 1500);
+      });
+    })
+    .catch(err => {
+      setTimeout(() => {
+        res.json({ hasErrors: true, error: err });
+      }, 1500);
+    });
 });
 
 router.delete("/:id", (req, res) => {
-  executeSQL(QUERY.DELETE_EVENT, [req.params.id]).then(result =>
-    res.send(result)
-  );
+  executeSQL(QUERY.DELETE_EVENT, [req.params.id]).then(() => {
+    setTimeout(() => {
+      res.send({
+        id: req.params.id
+      });
+    }, 1500);
+  });
 });
 
 module.exports = router;

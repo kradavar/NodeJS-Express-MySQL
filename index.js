@@ -78,7 +78,6 @@ passport.use(
               message: "Invalid password."
             });
           }
-          console.log({ ...rows[0] });
           return done(null, { ...rows[0] });
         })
         .catch(err => done(err));
@@ -98,10 +97,7 @@ passport.use(
       const user = Object.values(req.body);
 
       executeSQL(QUERY.INSERT_USER, user)
-        .then(result => {
-          console.log({ id: result.insertId, ...req.body });
-          return done(null, { id: result.insertId, ...req.body });
-        })
+        .then(result => done(null, { id: result.insertId, ...req.body }))
         .catch(err => done(err));
     }
   )
