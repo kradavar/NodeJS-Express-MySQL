@@ -3,6 +3,7 @@ const QUERY = {
   DELETE_EVENT: `DELETE FROM events WHERE id = ?`,
   EDIT_EVENT: `UPDATE events SET event_name = ?,start = ?,end=?, user_id = ? WHERE id = ?`,
   SELECT_USER_EVENTS: `SELECT * FROM events WHERE user_id IN (`,
+  SELECT_EVENT: `SELECT * FROM events WHERE id=?`,
   INSERT_USER: `INSERT INTO users(username,password,full_name) VALUES(?,?,?)`,
   DELETE_USER: `DELETE FROM users WHERE id = ?`,
   EDIT_USER: `UPDATE users SET username = ?,password = ? full_name = ? WHERE id = ?`,
